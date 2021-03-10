@@ -1,4 +1,9 @@
 module PrimeFactors (primeFactors) where
 
 primeFactors :: Integer -> [Integer]
-primeFactors n = error "You need to implement this function."
+primeFactors 1 = []
+primeFactors n =
+  case factors of
+    [] -> [n]
+    _  -> factors ++ primeFactors (n `div` head factors)
+  where factors = take 1 $ filter (\x -> (n `mod` x) == 0) [2 .. floor . sqrt $ fromIntegral n]
