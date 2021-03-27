@@ -5,4 +5,13 @@ module Sieve (primesUpTo) where
 import Prelude hiding (div, mod, divMod, rem, quotRem, quot, (/))
 
 primesUpTo :: Integer -> [Integer]
-primesUpTo n = error "You need to implement this function."
+primesUpTo n = fst $ sieve ([], [2..n])
+    where
+        sieve :: ([Integer],[Integer]) -> ([Integer],[Integer])
+        sieve (primes,[]) = (primes,[])
+        sieve (primes, candidates) = sieve (primes ++ [nextPrime], filter (not . multiple) candidates)
+            where
+                nextPrime = head candidates
+
+                multiple :: Integer -> Bool
+                multiple k = k `elem` [nextPrime * i | i <- [1..n]]
