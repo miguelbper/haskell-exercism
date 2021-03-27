@@ -1,0 +1,12 @@
+? C:\Users\Miguel\Exercism\haskell\largest-series-product\.stack-work\dist\29cc6475\build\test\autogen\Paths_largest_series_product.hs
+: hash: 5202aa4a039022d0b6fd28d7709aed41cd0eede824fdf3fff00c74411bac0fb2
+C:\Users\Miguel\AppData\Local\Programs\stack\x86_64-windows\ghc-8.8.4\lib\include\ghcversion.h:
+  hash: 297e8571427d670d413977834f5cdfc77cb89051d2f5b8302303c442346d15d0
+C:\Users\Miguel\Exercism\haskell\largest-series-product\largest-series-product.cabal:
+  hash: 76ccde5d6b56544f66d70437cde0a95d02b8b2edc36f19ad16f4a11d0e1df51b
+C:\Users\Miguel\Exercism\haskell\largest-series-product\test\Tests.hs:
+  hash: 49bed7834ebf0a0889536b6f2608d3befedea7a0014ca265fb2bb272a9afd6ef
+C:\Users\Miguel\Exercism\haskell\largest-series-product\.stack-work\dist\29cc6475\build\test\autogen\cabal_macros.h:
+  hash: 67fac2a1bedb07d7a900b2ac597c48ccf88cdb390d1dc69badae4e5d88c726d0
+C:\Users\Miguel\Exercism\haskell\largest-series-product\package.yaml:
+  hash: 2abf7ba894991c61c02a31c0703b263742ff345c57ac7e1a113e7785e58f0d33
