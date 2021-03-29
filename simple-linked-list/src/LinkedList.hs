@@ -10,28 +10,28 @@ module LinkedList
     , toList
     ) where
 
-data LinkedList a = Dummy deriving (Eq, Show)
+data LinkedList a = Nil 
+                  | New { datum :: a, next :: LinkedList a } deriving (Eq, Show)
 
-datum :: LinkedList a -> a
-datum linkedList = error "You need to implement this function."
-
-fromList :: [a] -> LinkedList a
-fromList xs = error "You need to implement this function."
-
-isNil :: LinkedList a -> Bool
-isNil linkedList = error "You need to implement this function."
+instance Foldable LinkedList where
+    foldr _ acc Nil = acc
+    foldr f acc (New x ll) = f x (foldr f acc ll)
 
 new :: a -> LinkedList a -> LinkedList a
-new x linkedList = error "You need to implement this function."
-
-next :: LinkedList a -> LinkedList a
-next linkedList = error "You need to implement this function."
+new = New
 
 nil :: LinkedList a
-nil = error "You need to implement this function."
+nil = Nil
 
-reverseLinkedList :: LinkedList a -> LinkedList a
-reverseLinkedList linkedList = error "You need to implement this function."
+isNil :: LinkedList a -> Bool
+isNil Nil = True
+isNil _   = False
+
+fromList :: [a] -> LinkedList a
+fromList = foldr new nil
 
 toList :: LinkedList a -> [a]
-toList linkedList = error "You need to implement this function."
+toList = foldr (:) []
+
+reverseLinkedList :: LinkedList a -> LinkedList a
+reverseLinkedList = foldl (flip new) nil
