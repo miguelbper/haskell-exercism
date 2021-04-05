@@ -15,44 +15,48 @@ module CustomSet
   ) where
 
 import Prelude hiding (null)
+import qualified Prelude as P (null)
+import qualified Data.List as L (sort)
 
-data CustomSet a = Dummy deriving (Eq, Show)
+type CustomSet a = [a]
 
-delete :: a -> CustomSet a -> CustomSet a
-delete x set = error "You need to implement this function."
+delete :: (Eq a) => a -> CustomSet a -> CustomSet a
+delete x set = difference set [x]
 
-difference :: CustomSet a -> CustomSet a -> CustomSet a
-difference setA setB = error "You need to implement this function."
+difference :: (Eq a) => CustomSet a -> CustomSet a -> CustomSet a
+difference setA setB = filter (`notElem` setB) setA
 
 empty :: CustomSet a
-empty = error "You need to implement this function."
+empty = []
 
-fromList :: [a] -> CustomSet a
-fromList xs = error "You need to implement this function."
+fromList :: (Eq a, Ord a) => [a] -> CustomSet a
+fromList = L.sort . foldr add []
+    where
+        add x l = if x `elem` l then l else x:l 
 
-insert :: a -> CustomSet a -> CustomSet a
-insert x set = error "You need to implement this function."
+insert :: (Eq a, Ord a) => a -> CustomSet a -> CustomSet a
+insert x set = fromList (x:set)
 
-intersection :: CustomSet a -> CustomSet a -> CustomSet a
-intersection setA setB = error "You need to implement this function."
+intersection :: (Eq a) => CustomSet a -> CustomSet a -> CustomSet a
+intersection setA setB = filter (`elem` setB) setA
 
-isDisjointFrom :: CustomSet a -> CustomSet a -> Bool
-isDisjointFrom setA setB = error "You need to implement this function."
+isDisjointFrom :: (Eq a) => CustomSet a -> CustomSet a -> Bool
+isDisjointFrom = curry (null . uncurry intersection)
 
-isSubsetOf :: CustomSet a -> CustomSet a -> Bool
-isSubsetOf setA setB = error "You need to implement this function."
+isSubsetOf :: (Eq a) => CustomSet a -> CustomSet a -> Bool
+isSubsetOf setA setB = all (`elem` setB) setA
 
-member :: a -> CustomSet a -> Bool
-member x set = error "You need to implement this function."
+member :: (Eq a) => a -> CustomSet a -> Bool
+member = elem
 
 null :: CustomSet a -> Bool
-null set = error "You need to implement this function."
+null = P.null
 
 size :: CustomSet a -> Int
-size set = error "You need to implement this function."
+size = length
 
 toList :: CustomSet a -> [a]
-toList set = error "You need to implement this function."
+toList = id
 
-union :: CustomSet a -> CustomSet a -> CustomSet a
-union setA setB = error "You need to implement this function."
+union :: (Eq a, Ord a) => CustomSet a -> CustomSet a -> CustomSet a
+union = curry (fromList . uncurry (++))
