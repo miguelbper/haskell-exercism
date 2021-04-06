@@ -1,8 +1,7 @@
 module PigLatin (translate) where
 
---import Data.String as T ( String(..), replace, pack, takeWhile, dropWhile, append, cons, head, take, tail, null, empty )
-
 import qualified Data.Text as T ( replace, pack, unpack )
+import Control.Arrow ((&&&))
 
 replace :: String -> String -> String -> String
 replace a b c = T.unpack (T.replace (T.pack a) (T.pack b) (T.pack c))
@@ -43,5 +42,12 @@ rest (x:y:xs)
     | y == '%'           = xs
     | otherwise          = dropWhile (`notElem` vowelMid) (y:xs)
 
+translate' :: String -> String
+translate' = flip (++) "ay"
+           . unconvert
+           . uncurry (++)
+           . (&&&) rest cluster
+           . convert
+
 translate :: String -> String
-translate xs = unconvert ((rest . convert $ xs) ++ (cluster . convert $ xs)) ++ "ay"
+translate = unwords . map translate' . words
