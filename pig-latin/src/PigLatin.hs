@@ -1,36 +1,47 @@
 module PigLatin (translate) where
 
-import Data.Text as T ( Text(..), replace, pack, takeWhile, dropWhile, append, cons, head, take, tail, null, empty )
+--import Data.String as T ( String(..), replace, pack, takeWhile, dropWhile, append, cons, head, take, tail, null, empty )
 
-convert :: Text -> Text
-convert = replace (pack "xr") (pack "#")
-        . replace (pack "yt") (pack "$")
-        . replace (pack "qu") (pack "%")
+import qualified Data.Text as T ( replace, pack, unpack )
 
-unconvert :: Text -> Text
-unconvert = replace (pack "#") (pack "xr")
-          . replace (pack "$") (pack "yt")
-          . replace (pack "%") (pack "qu")
+replace :: String -> String -> String -> String
+replace a b c = T.unpack (T.replace (T.pack a) (T.pack b) (T.pack c))
+
+convert :: String -> String
+convert = replace "xr" "#"
+        . replace "yt" "$"
+        . replace "qu" "%"
+
+unconvert :: String -> String
+unconvert = replace "#" "xr"
+          . replace "$" "yt"
+          . replace "%" "qu"
 
 vowelInit :: [Char]
 vowelInit = ['a','e','i','o','u','#','$']
 
 vowelMid :: [Char]
-vowelMid = ['a','e','i','o','u','%']
+vowelMid = ['a','e','i','o','u','y','$']
 
-cluster :: Text -> Text
-cluster text 
-    | T.null text = T.empty 
-    | otherwise   = if T.head text `elem` vowelInit 
-                        then empty 
-                        else T.takeWhile (`notElem` vowelMid) text
+cluster :: String -> String
+cluster [] = []
+cluster [x]
+    | x `elem` vowelInit = []
+    | otherwise          = [x]
+cluster (x:y:xs)
+    | x `elem` vowelInit = []
+    | y == '%'           = x:[y]
+    | otherwise          = x : takeWhile (`notElem` vowelMid) (y:xs)
 
-rest :: Text -> Text
-rest text 
-    | T.null text = T.empty 
-    | otherwise   = if T.head text `elem` vowelInit 
-                        then text 
-                        else T.dropWhile (`notElem` vowelMid) text
+rest :: String -> String
+rest [] = []
+rest [x]
+    | x `elem` vowelInit = [x]
+    | otherwise          = []
+rest (x:y:xs)
+    | x `elem` vowelInit = x:y:xs
+    | y == '%'           = xs
+    | otherwise          = dropWhile (`notElem` vowelMid) (y:xs)
 
-translate :: Text -> Text
-translate xs = unconvert ((rest . convert $ xs) `append` (cluster . convert $ xs)) `append` pack "ay"
+translate :: String -> String
+translate xs = unconvert ((rest . convert $ xs) ++ (cluster . convert $ xs)) ++ "ay"
