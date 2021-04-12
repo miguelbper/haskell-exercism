@@ -1,27 +1,20 @@
 module Clock (addDelta, fromHourMin, toString) where
 
-import Data.Digits (digits) 
+import Text.Printf ( printf )
 
 type Hour = Int
 type Min  = Int
 
-data Clock = Clock { hour :: Hour, min :: Min }
-  deriving Eq
+data Clock = Clock Hour Min deriving Eq
 
 fromHourMin :: Hour -> Min -> Clock
-fromHourMin hour min = addDelta hour min (Clock 0 0)
+fromHourMin hh mm = addDelta hh mm (Clock 0 0)
 
 toString :: Clock -> String
-toString (Clock hh mm) = toStr hh ++ ":" ++ toStr mm
-  where
-    toStr :: Int -> String
-    toStr = map (toEnum . (+) 48) 
-          . reverse . take 2 . reverse 
-          . (:) 0 . (:) 0 
-          . digits 10
+toString (Clock hh mm) = printf "%02d:%02d" hh mm
 
 addDelta :: Hour -> Min -> Clock -> Clock
-addDelta hour min (Clock hh mm) = Clock hnew mnew
+addDelta hour mnt (Clock hh mm) = Clock hnew mnew
   where
-    hnew = (hh + hour + ((mm + min) `div` 60)) `mod` 24
-    mnew = (mm + min) `mod` 60
+    hnew = (hh + hour + ((mm + mnt) `div` 60)) `mod` 24
+    mnew = (mm + mnt) `mod` 60
