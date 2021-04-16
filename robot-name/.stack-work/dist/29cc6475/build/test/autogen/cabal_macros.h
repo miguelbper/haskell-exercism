@@ -22,6 +22,17 @@
   (major1) == 4 && (major2) == 13 && (minor) <= 0)
 #endif /* MIN_VERSION_base */
 
+/* package containers-0.6.2.1 */
+#ifndef VERSION_containers
+#define VERSION_containers "0.6.2.1"
+#endif /* VERSION_containers */
+#ifndef MIN_VERSION_containers
+#define MIN_VERSION_containers(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  6 || \
+  (major1) == 0 && (major2) == 6 && (minor) <= 2)
+#endif /* MIN_VERSION_containers */
+
 /* package hspec-2.7.4 */
 #ifndef VERSION_hspec
 #define VERSION_hspec "2.7.4"
@@ -43,6 +54,17 @@
   (major1) == 2 && (major2) <  2 || \
   (major1) == 2 && (major2) == 2 && (minor) <= 2)
 #endif /* MIN_VERSION_mtl */
+
+/* package random-1.1 */
+#ifndef VERSION_random
+#define VERSION_random "1.1"
+#endif /* VERSION_random */
+#ifndef MIN_VERSION_random
+#define MIN_VERSION_random(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  1 || \
+  (major1) == 1 && (major2) == 1 && (minor) <= 0)
+#endif /* MIN_VERSION_random */
 
 /* package robot-name-0.1.0.4 */
 #ifndef VERSION_robot_name
@@ -144,7 +166,7 @@
 #endif /* MIN_TOOL_VERSION_strip */
 
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "robot-name-0.1.0.4-66Blk6ThnRe2wqGC4mz5u9-test"
+#define CURRENT_COMPONENT_ID "robot-name-0.1.0.4-AukBWMUdc2M5MlM5AQAIrP-test"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "0.1.0.4"

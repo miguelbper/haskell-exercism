@@ -30,7 +30,7 @@ version = Version [0,1,0,4] []
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 
 bindir     = "C:\\Users\\Miguel\\Exercism\\haskell\\robot-name\\.stack-work\\install\\e0f1c74b\\bin"
-libdir     = "C:\\Users\\Miguel\\Exercism\\haskell\\robot-name\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4\\robot-name-0.1.0.4-66Blk6ThnRe2wqGC4mz5u9-test"
+libdir     = "C:\\Users\\Miguel\\Exercism\\haskell\\robot-name\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4\\robot-name-0.1.0.4-AukBWMUdc2M5MlM5AQAIrP-test"
 dynlibdir  = "C:\\Users\\Miguel\\Exercism\\haskell\\robot-name\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4"
 datadir    = "C:\\Users\\Miguel\\Exercism\\haskell\\robot-name\\.stack-work\\install\\e0f1c74b\\share\\x86_64-windows-ghc-8.8.4\\robot-name-0.1.0.4"
 libexecdir = "C:\\Users\\Miguel\\Exercism\\haskell\\robot-name\\.stack-work\\install\\e0f1c74b\\libexec\\x86_64-windows-ghc-8.8.4\\robot-name-0.1.0.4"

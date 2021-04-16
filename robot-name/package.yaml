@@ -4,6 +4,8 @@ version: 0.1.0.4
 dependencies:
   - base
   - mtl
+  - containers
+  - random
 
 library:
   exposed-modules: Robot
