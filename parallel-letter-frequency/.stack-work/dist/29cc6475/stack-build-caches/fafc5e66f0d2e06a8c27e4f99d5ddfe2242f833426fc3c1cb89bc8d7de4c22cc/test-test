@@ -1,0 +1,12 @@
+? C:\Users\Miguel\Exercism\haskell\parallel-letter-frequency\.stack-work\dist\29cc6475\build\test\autogen\Paths_parallel_letter_frequency.hs
+: hash: e08afd6122f8603bf85d3a1540bb358d597c85f881ca8a1286dcafd85dd0389d
+C:\Users\Miguel\AppData\Local\Programs\stack\x86_64-windows\ghc-8.8.4\lib\include\ghcversion.h:
+  hash: 297e8571427d670d413977834f5cdfc77cb89051d2f5b8302303c442346d15d0
+C:\Users\Miguel\Exercism\haskell\parallel-letter-frequency\package.yaml:
+  hash: 1028a5e8fd1666e776ccf2687072b304194fe178c8338e6e21a5b27746fc9b4f
+C:\Users\Miguel\Exercism\haskell\parallel-letter-frequency\parallel-letter-frequency.cabal:
+  hash: 42b62c09f56564e48fac26b6a3b6b595ef112a338da3f4d49cd3075b2a3b0423
+C:\Users\Miguel\Exercism\haskell\parallel-letter-frequency\.stack-work\dist\29cc6475\build\test\autogen\cabal_macros.h:
+  hash: bcf62b066a3eca56c5a344fbb217065eedd4d91266ee80a45da2f06ae9daac48
+C:\Users\Miguel\Exercism\haskell\parallel-letter-frequency\test\Tests.hs:
+  hash: 11ae1abb5961a5c8abb4d7c8ca0946c1f13cab4e2f300e36f6c0c3462767163e
