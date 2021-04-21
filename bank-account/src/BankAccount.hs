@@ -6,16 +6,20 @@ module BankAccount
     , openAccount
     ) where
 
-data BankAccount = Dummy
+import Control.Monad ( void )
+import Control.Arrow ( (&&&) )
+import Control.Concurrent ( MVar, newMVar, readMVar, swapMVar, modifyMVar )
 
-closeAccount :: BankAccount -> IO ()
-closeAccount account = error "You need to implement this function."
-
-getBalance :: BankAccount -> IO (Maybe Integer)
-getBalance account = error "You need to implement this function."
-
-incrementBalance :: BankAccount -> Integer -> IO (Maybe Integer)
-incrementBalance account amount = error "You need to implement this function."
+type BankAccount = MVar (Maybe Integer)
 
 openAccount :: IO BankAccount
-openAccount = error "You need to implement this function."
+openAccount = newMVar $ Just 0
+
+closeAccount :: BankAccount -> IO ()
+closeAccount = void . flip swapMVar Nothing
+
+getBalance :: BankAccount -> IO (Maybe Integer)
+getBalance = readMVar
+
+incrementBalance :: BankAccount -> Integer -> IO (Maybe Integer)
+incrementBalance account amount = modifyMVar account (return . ( id &&& id ) . fmap (amount +))
