@@ -30,7 +30,7 @@ version = Version [1,3,0,7] []
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 
 bindir     = "C:\\Users\\Miguel\\Exercism\\haskell\\change\\.stack-work\\install\\e0f1c74b\\bin"
-libdir     = "C:\\Users\\Miguel\\Exercism\\haskell\\change\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4\\change-1.3.0.7-Bok6C4Aa1CSLpBoEfBpyyi-test"
+libdir     = "C:\\Users\\Miguel\\Exercism\\haskell\\change\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4\\change-1.3.0.7-IYzD3LQdTZ9FF6vlFgGThl-test"
 dynlibdir  = "C:\\Users\\Miguel\\Exercism\\haskell\\change\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4"
 datadir    = "C:\\Users\\Miguel\\Exercism\\haskell\\change\\.stack-work\\install\\e0f1c74b\\share\\x86_64-windows-ghc-8.8.4\\change-1.3.0.7"
 libexecdir = "C:\\Users\\Miguel\\Exercism\\haskell\\change\\.stack-work\\install\\e0f1c74b\\libexec\\x86_64-windows-ghc-8.8.4\\change-1.3.0.7"

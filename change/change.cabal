@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e11642d14241eb3f44b6b36aeb6c59aa6315f8084442e1a5ba5f3643ee884ea6
+-- hash: 3eb98ee2e6102771f913f8d67c88a7a7e1d8fb38694664c0c1bfe7e3177035af
 
 name:           change
 version:        1.3.0.7
@@ -20,6 +20,7 @@ library
   ghc-options: -Wall
   build-depends:
       base
+    , safe
   default-language: Haskell2010
 
 test-suite test
@@ -33,4 +34,5 @@ test-suite test
       base
     , change
     , hspec
+    , safe
   default-language: Haskell2010

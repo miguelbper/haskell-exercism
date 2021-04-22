@@ -1,14 +1,13 @@
 module Change (findFewestCoins) where
 
-import Control.Monad ( liftM2 )
+import Safe ( headMay )
 
 findFewestCoins :: Integer -> [Integer] -> Maybe [Integer]
-findFewestCoins target coins = 
-    if null newCoins 
-        then Nothing
-        else fmap (change ++ ) (findFewestCoins newTarget coins)
-    where
-        newCoins  = filter (<= target) coins
-        bigCoin   = maximum . filter (< target) $ coins
-        nBigCoin  = target `div` bigCoin
-        newTarget = target `mod` bigCoin
+findFewestCoins = fmap headMay . solutions
+
+solutions :: Integer -> [Integer] -> [[Integer]]
+solutions _ [] = []
+solutions c (x:xs)
+    | c <  0    = []
+    | c == 0    = [[]]
+    | otherwise = solutions c xs ++ map (x : ) ( solutions (c - x) (x : xs) )

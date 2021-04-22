@@ -22,6 +22,17 @@
   (major1) == 4 && (major2) == 13 && (minor) <= 0)
 #endif /* MIN_VERSION_base */
 
+/* package safe-0.3.19 */
+#ifndef VERSION_safe
+#define VERSION_safe "0.3.19"
+#endif /* VERSION_safe */
+#ifndef MIN_VERSION_safe
+#define MIN_VERSION_safe(major1,major2,minor) (\
+  (major1) <  0 || \
+  (major1) == 0 && (major2) <  3 || \
+  (major1) == 0 && (major2) == 3 && (minor) <= 19)
+#endif /* MIN_VERSION_safe */
+
 /* tool gcc-7.2.0 */
 #ifndef TOOL_VERSION_gcc
 #define TOOL_VERSION_gcc "7.2.0"
@@ -111,10 +122,10 @@
 #endif /* MIN_TOOL_VERSION_strip */
 
 #ifndef CURRENT_PACKAGE_KEY
-#define CURRENT_PACKAGE_KEY "change-1.3.0.7-3RWRaHhNZBUDrqViNozY0e"
+#define CURRENT_PACKAGE_KEY "change-1.3.0.7-JLb4UK3GK3YDmV6luP0B9Y"
 #endif /* CURRENT_PACKAGE_KEY */
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "change-1.3.0.7-3RWRaHhNZBUDrqViNozY0e"
+#define CURRENT_COMPONENT_ID "change-1.3.0.7-JLb4UK3GK3YDmV6luP0B9Y"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "1.3.0.7"
