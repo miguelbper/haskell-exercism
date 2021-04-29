@@ -1,77 +1,84 @@
 module Poker (bestHands) where
 
+import Data.Ord (comparing)
+import Data.List ( group, groupBy, sort, sortOn, maximumBy ) 
 import Control.Monad ( liftM2, join, (<=<) )
 import Control.Arrow ( Arrow((***)), (&&&) ) 
 
 -- datatypes
-data Suit = S | D | H | C deriving (Eq)
-data Rank = N2 | N3 | N4 | N5 | N6 | N7 | N8 | N9 | N10 | J | Q | K | A deriving (Eq, Ord, Enum)
-data Card = Card { rank :: Rank, suit :: Suit } deriving (Eq)
---data Hand = Hand { c1 :: Card, c2 :: Card, c3 :: Card, c4 :: Card, c5 :: Card } deriving (Eq)
-newtype Hand = Hand { listFromHand :: [Card] } deriving (Eq)
-data HandRank = HighCard      Rank
-              | OnePair       Rank
-              | TwoPair       Rank
-              | ThreeOfAKind  Rank
+data Suit = S | D | H | C deriving (Eq, Show)
+data Rank = N2 | N3 | N4 | N5 | N6 | N7 | N8 | N9 | N10 | J | Q | K | A deriving (Eq, Ord, Enum, Show)
+data Card = Card { rank :: Rank, suit :: Suit } deriving (Eq, Show)
+type Hand = [Card]
+data HandRank = HighCard      [Rank]
+              | OnePair       Rank Rank Rank Rank
+              | TwoPair       Rank Rank Rank
+              | ThreeOfAKind  Rank Rank Rank
               | Straight      Rank
-              | Flush         Rank
-              | FullHouse     Rank
-              | FourOfAKind   Rank
-              | StraightFlush Rank deriving (Eq, Ord)
+              | Flush         [Rank] 
+              | FullHouse     Rank Rank
+              | FourOfAKind   Rank Rank
+              | StraightFlush Rank 
+              deriving (Eq, Ord, Show)
 
--- instances
--- this instance of Ord is not antisymmetric
+-- instances this instance of Ord is not antisymmetric
 instance Ord Card where
     (<=) = curry ( uncurry (<=) . ( rank *** rank ) )
-
--- instance Ord HandRank where
-
-
--- this instance of Ord is not antisymmetric
-instance Ord Hand where
-    (<=) = curry ( uncurry (<=) . ( handRank *** handRank ) )
+    (>=) = curry ( uncurry (>=) . ( rank *** rank ) )
 
 -- main functions
 bestHands :: [String] -> Maybe [String]
-bestHands = fmap (return . stringFromHand . maximum) . mapM handFromString
+bestHands = fmap ( map stringFromHand 
+                 . maximumBy (\xs ys -> compare (handRank . head $ xs) (handRank . head $ ys) )
+                 . groupBy (\c1 c2 -> handRank c1 == handRank c2) ) 
+          . mapM handFromString
+
 
 handRank :: Hand -> HandRank
-handRank hand = error "lol"
-{-     | isStraightFlush hand = StraightFlush        
-    | isFourOfAKind   hand = FourOfAKind      
-    | isFullHouse     hand = FullHouse     
-    | isFlush         hand = Flush 
-    | isStraight      hand = Straight    
-    | isThreeOfAKind  hand = ThreeOfAKind       
-    | isTwoPair       hand = TwoPair  
-    | isOnePair       hand = OnePair
+handRank hand
+    | strHi && flush = StraightFlush (last rankList)
+    | strLo && flush = StraightFlush (last . init $ rankList)
+    | flush          = Flush         (map rank . reverse . sort $ hand)
+    | strHi          = Straight      (last rankList)
+    | strLo          = Straight      (last . init $ rankList)
+    | otherwise      = case rankGrps of
+        [[g],[h,_,_,_]]     -> FourOfAKind h g
+        [[g,_],[h,_,_]]     -> FullHouse h g
+        [[g],[h],[i,_,_]]   -> ThreeOfAKind i h g
+        [[g],[h,_],[i,_]]   -> TwoPair i h g
+        [[g],[h],[i],[j,_]] -> OnePair j i h g
+        _                   -> HighCard (map rank . reverse . sort $ hand)
     where
-        isStraightFlush hand = True
-        isFourOfAKind   hand = True
-        isFullHouse     hand = True
-        isFlush         hand = True
-        isStraight      hand = True
-        isThreeOfAKind  hand = True
-        isTwoPair       hand = True
-        isOnePair       hand = True -}
+        rankList = sort . map rank $ hand
+        rankGrps = sortOn length . group $ rankList
+
+        flush = allEqual . map suit $ hand
+        strHi = ascending rankList
+        strLo = ascending (init rankList) && last rankList == A
+
+-- helper functions
+ascending :: (Enum a, Eq a) => [a] -> Bool
+ascending xs = all (\(x,y) -> succ x == y) (zip xs (tail xs))
+
+allEqual :: Eq a => [a] -> Bool
+allEqual = and . (zipWith (==) <*> tail)
 
 -- convert between hand and string
 stringFromHand :: Hand -> String
 stringFromHand = unwords
                . map ( uncurry (++)
                      . ( showRank . rank &&& showSuit . suit ) )
-               . listFromHand
 
 handFromString :: String -> Maybe Hand
-handFromString = fmap Hand . mapM readCard . words
-
-readCard :: String -> Maybe Card
-readCard xs = do
-    let i = init xs
-    let l = return (last xs)
-    r <- readRank i
-    s <- readSuit l
-    return $ Card r s
+handFromString = mapM readCard . words
+    where
+        readCard :: String -> Maybe Card
+        readCard xs = do
+            let i = init xs
+            let l = return (last xs)
+            r <- readRank i
+            s <- readSuit l
+            return $ Card r s
 
 -- read and show
 showSuit :: Suit -> String
