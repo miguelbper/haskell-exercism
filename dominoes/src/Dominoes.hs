@@ -1,6 +1,6 @@
 module Dominoes (chain) where
 
-import Data.List ( find, permutations, delete )
+import Data.List ( find, delete )
 import Data.Tuple ( swap ) 
 
 type Domino = (Int,Int)
