@@ -25,22 +25,21 @@ findErrors gs
     | null gs        = Left IncompleteGame
     | not (null err) = Left (InvalidRoll eii etv)
     | lastFrame < 10 = Left IncompleteGame
-    | not (null additionalThrows) = Left (InvalidRoll aii atv)
+    | not (null adt) = Left (InvalidRoll aii atv)
     | otherwise      = Right gs 
     where
-        (lastFrame, _, _, _) = last gs
-        err = filter (\(_, _, _, yfs) -> yfs == Error) gs
+        err = filter (\(_, _, _, s) -> s == Error) gs
         (_, eii, etv, _) = head err
 
-        (xfn, xii, xtv, xfs) = last . filter (\(yfn, _, _, _) -> yfn <= 10) $ gs
-        
-        additionalThrowsN
+        (lastFrame, _, _, _) = last gs
+
+        (_, xii, _, xfs) = last . filter (\(f, _, _, _) -> f <= 10) $ gs
+        nAdditThrows
             | xfs == Strike = 2
             | xfs == Spare  = 1
             | otherwise     = 0
-        
-        additionalThrows = filter (\(_, i, _, _) -> i > xii + additionalThrowsN) gs
-        (_, aii, atv, _) = head additionalThrows
+        adt = filter (\(_, i, _, _) -> i > xii + nAdditThrows) gs
+        (_, aii, atv, _) = head adt
 
 
 score' :: Game -> Either BowlingError Score
@@ -76,7 +75,7 @@ addThrow gs x = gs ++ [xx]
     where
         (yfn, yii, ytv, yfs) = if null gs then (0,-1,0,Open) else last gs
 
-        toNewFrame = yfs == Open || yfs == Spare || yfs == Strike || (yfs == Fill && ytv == 10) -- && yfn /= 10
+        toNewFrame = yfs == Open || yfs == Spare || yfs == Strike || (yfs == Fill && ytv == 10)
         isFill     = yfs == Fill || (yfn == 10 && yfs /= First)
         frameScore = xtv + ytv * fromEnum (not toNewFrame)
 
@@ -86,7 +85,6 @@ addThrow gs x = gs ++ [xx]
         xfs
             | x < 0            = Error
             | frameScore > 10  = Error
-            | isFill && not (yfs == Spare || yfs == Strike || yfs == Fill) = Error
             | isFill           = Fill
             | frameScore == 10 = if toNewFrame then Strike else Spare
             | otherwise        = if toNewFrame then First  else Open
