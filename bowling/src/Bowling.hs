@@ -14,7 +14,7 @@ type ThrowVal = Int
 type Frame    = (FrameNr, Index, ThrowVal, FrameSc)
 type Throws   = [ThrowVal]
 type Game     = [Frame]
-data FrameSc  = Error | First | Open | Spare | Strike deriving (Eq, Show)
+data FrameSc  = Error | First | Fill | Open | Spare | Strike deriving (Eq, Show)
 
 -- main functions
 score :: Throws -> Either BowlingError Score
@@ -41,14 +41,14 @@ score' (x:xs) = if condition then result else invRoll
             | xfs == Spare  = length xs >= 1
             | otherwise     = True
 
-        score
+        scr
             | xfs == Strike = xtv + ytv + ztv
             | xfs == Spare  = xtv + ytv
             | otherwise     = xtv
 
         invRoll = Left (InvalidRoll xii xtv)
 
-        result = liftM2 (+) (Right score) (score' xs)
+        result = liftM2 (+) (Right scr) (score' xs)
 
 complete :: Game -> Bool
 complete = const True
@@ -58,27 +58,22 @@ gameFromThrows :: Throws -> Game
 gameFromThrows = foldl addThrow []
 
 addThrow :: Game -> ThrowVal -> Game
-addThrow gs x = gs ++ newFrame
+addThrow gs x = gs ++ [xx]
     where
-        newFrame = if null gs then [(1,1,x,s)] 
-                              else [computeThrow (last gs) x]
+        (yfn, yii, ytv, yfs) = if null gs then (0,0,0,Open) else last gs
 
-        s | x < 0 || x > 10 = Error
-          | x == 10         = Strike
-          | otherwise       = First
+        toNewFrame = yfs /= First && yfn /= 10
+        isFill     = (yfs == Strike || yfs == Spare) && yfn == 10
+        frameScore = xtv + ytv * fromEnum (not toNewFrame)
 
-computeThrow :: Frame -> ThrowVal -> Frame
-computeThrow (yfn, yii, ytv, yfs) x = (xfn, xii, xtv, xfs)
-    where
         xtv = x
         xii = yii + 1
-        xfn = yfn + (if newFrame then 1 else 0)
-        
-        newFrame = yfs /= First && yfn /= 10
+        xfn = yfn + fromEnum toNewFrame
+        xfs
+            | x < 0            = Error
+            | frameScore > 10  = Error
+            | isFill           = Fill
+            | frameScore == 10 = if toNewFrame then Strike else Spare
+            | otherwise        = if toNewFrame then First  else Open
 
-        yaa = if newFrame then 0 else ytv
-        
-        xfs | x < 0         = Error
-            | x + yaa >  10 = Error
-            | x + yaa == 10 = Spare
-            | otherwise     = Open
+        xx = (xfn, xii, xtv, xfs)
