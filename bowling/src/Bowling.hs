@@ -28,7 +28,7 @@ findErrors gs = if null errors then Right gs else Left (InvalidRoll eii etv)
 
 score' :: Game -> Either BowlingError Score
 score' []     = Right 0
-score' (x:xs) = if condition then result else (Left IncompleteGame)
+score' (x:xs) = if condition then result else Left IncompleteGame
     where
         y = xs !! 0
         z = xs !! 1
