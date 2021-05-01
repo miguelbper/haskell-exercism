@@ -21,10 +21,27 @@ score :: Throws -> Either BowlingError Score
 score = score' <=< (findErrors . gameFromThrows)
 
 findErrors :: Game -> Either BowlingError Game
-findErrors gs = if null errors then Right gs else Left (InvalidRoll eii etv)
+findErrors gs 
+    | null gs        = Left IncompleteGame
+    | not (null err) = Left (InvalidRoll eii etv)
+    | lastFrame < 10 = Left IncompleteGame
+    | not (null additionalThrows) = Left (InvalidRoll aii atv)
+    | otherwise      = Right gs 
     where
-        errors = filter (\(_, _, _, yfs) -> yfs == Error) gs
-        (_, eii, etv, _) = head errors
+        (lastFrame, _, _, _) = last gs
+        err = filter (\(_, _, _, yfs) -> yfs == Error) gs
+        (_, eii, etv, _) = head err
+
+        (xfn, xii, xtv, xfs) = last . filter (\(yfn, _, _, _) -> yfn <= 10) $ gs
+        
+        additionalThrowsN
+            | xfs == Strike = 2
+            | xfs == Spare  = 1
+            | otherwise     = 0
+        
+        additionalThrows = filter (\(_, i, _, _) -> i > xii + additionalThrowsN) gs
+        (_, aii, atv, _) = head additionalThrows
+
 
 score' :: Game -> Either BowlingError Score
 score' []     = Right 0
@@ -59,9 +76,9 @@ addThrow gs x = gs ++ [xx]
     where
         (yfn, yii, ytv, yfs) = if null gs then (0,-1,0,Open) else last gs
 
-        toNewFrame = yfs /= First && yfn /= 10
-        isFill     = (yfs == Strike || yfs == Spare || yfs == Fill) && yfn == 10
-        frameScore = xtv + ytv * fromEnum (not (toNewFrame || isFill))
+        toNewFrame = yfs == Open || yfs == Spare || yfs == Strike || (yfs == Fill && ytv == 10) -- && yfn /= 10
+        isFill     = yfs == Fill || (yfn == 10 && yfs /= First)
+        frameScore = xtv + ytv * fromEnum (not toNewFrame)
 
         xtv = x
         xii = yii + 1
@@ -69,6 +86,7 @@ addThrow gs x = gs ++ [xx]
         xfs
             | x < 0            = Error
             | frameScore > 10  = Error
+            | isFill && not (yfs == Spare || yfs == Strike || yfs == Fill) = Error
             | isFill           = Fill
             | frameScore == 10 = if toNewFrame then Strike else Spare
             | otherwise        = if toNewFrame then First  else Open
