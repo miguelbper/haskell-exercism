@@ -1,63 +1,84 @@
 module Bowling (score, BowlingError(..)) where
 
-import Data.Tuple ( swap )
 import Control.Monad ( liftM2 )
-import Data.List (intercalate)
-import Data.List.Split (splitOn)
 
 data BowlingError = IncompleteGame
                   | InvalidRoll { rollIndex :: Int, rollValue :: Int }
   deriving (Eq, Show)
 
-type Throw = Int
-type Frame = (Throw, Throw)
-type Game  = [Frame]
-type Score = Int
+-- data types
+type Score    = Int 
+type FrameNr  = Int 
+type Index    = Int
+type ThrowVal = Int 
+type Frame    = (FrameNr, Index, ThrowVal, FrameSc)
+type Throws   = [ThrowVal]
+type Game     = [Frame]
+data FrameSc  = Error | First | Open | Spare | Strike deriving (Eq, Show)
 
-isOpen :: Frame -> Bool
-isOpen = (< 10) . uncurry (+)
-
-isSpare :: Frame -> Bool
-isSpare = liftM2 (&&) ( (== 10) . uncurry (+) ) ( not . isStrike )
-
-isStrike :: Frame -> Bool
-isStrike = (10 == ) . fst
-
-gameFromThrows :: [Throw] -> Game
-gameFromThrows = gameFromThrowsHelper . insertZeros
+-- main functions
+score :: Throws -> Either BowlingError Score
+score ts = if cl then sc else Left IncompleteGame
     where
-        gameFromThrowsHelper :: [Throw] -> Game
-        gameFromThrowsHelper []       = []
-        gameFromThrowsHelper (x:y:xs) = (x,y) : gameFromThrowsHelper xs
-        gameFromThrowsHelper (x:xs)   = [] 
+        gs = gameFromThrows ts
+        cl = complete gs
+        sc = score' gs
 
-        insertZeros :: [Throw] -> [Throw]
-        insertZeros = map snd . insertZerosHelper . zip [0,1..]
-            where
-                addOneToInd :: [(Int, a)] -> [(Int, a)]
-                addOneToInd = map $ swap . fmap (+1) . swap
+score' :: Game -> Either BowlingError Score
+score' []     = Right 0
+score' (x:xs) = if condition then result else invRoll
+    where
+        y = xs !! 0
+        z = xs !! 1
+
+        (_  , xii, xtv, xfs) = x
+        (_  , _  , ytv, _  ) = y
+        (_  , _  , ztv, _  ) = z
+
+        condition
+            | xfs == Error  = False
+            | xfs == Strike = length xs >= 2
+            | xfs == Spare  = length xs >= 1
+            | otherwise     = True
+
+        score
+            | xfs == Strike = xtv + ytv + ztv
+            | xfs == Spare  = xtv + ytv
+            | otherwise     = xtv
+
+        invRoll = Left (InvalidRoll xii xtv)
+
+        result = liftM2 (+) (Right score) (score' xs)
+
+complete :: Game -> Bool
+complete = const True
+
+-- convert
+gameFromThrows :: Throws -> Game
+gameFromThrows = foldl addThrow []
+
+addThrow :: Game -> ThrowVal -> Game
+addThrow gs x = gs ++ newFrame
+    where
+        newFrame = if null gs then [(1,1,x,s)] 
+                              else [computeThrow (last gs) x]
+
+        s | x < 0 || x > 10 = Error
+          | x == 10         = Strike
+          | otherwise       = First
+
+computeThrow :: Frame -> ThrowVal -> Frame
+computeThrow (yfn, yii, ytv, yfs) x = (xfn, xii, xtv, xfs)
+    where
+        xtv = x
+        xii = yii + 1
+        xfn = yfn + (if newFrame then 1 else 0)
         
-                insertZerosHelper :: [(Int,Throw)] -> [(Int,Throw)]
-                insertZerosHelper [] = []
-                insertZerosHelper ((i,x) : xs)
-                    | x == 10 && even i = (:) (i,x) 
-                                        . (:) (i+1,0) 
-                                        . insertZerosHelper
-                                        . addOneToInd 
-                                        $ xs
-                    | otherwise         = (i,x) : insertZerosHelper xs
+        newFrame = yfs /= First && yfn /= 10
 
-isValidInput :: [Throw] -> Bool
-isValidInput = liftM2 (&&) throwsInRange correctNThrows
-    where
-        throwsInRange = all (`elem` [0..10])
-
-        correctNThrows :: [Int] -> Bool
-        correctNThrows xs = True
-
-isIncomplete :: Game -> Bool
-isIncomplete xs = (length xs < 10)
-               || (isStrike (xs !! 9) || isSpare (xs !! 9)  )
-
-score :: [Throw] -> Either BowlingError Score
-score rolls = error "You need to implement this function."
+        yaa = if newFrame then 0 else ytv
+        
+        xfs | x < 0         = Error
+            | x + yaa >  10 = Error
+            | x + yaa == 10 = Spare
+            | otherwise     = Open
