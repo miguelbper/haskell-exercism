@@ -1,7 +1,6 @@
 module Connect (Mark(..), winner) where
 
 import Data.Char ( isSpace )
-import Data.List ( null )
 import Data.Array ( Array, (!), indices, listArray )
 
 type Pos   = (Int, Int)
@@ -11,16 +10,10 @@ type Board = Array Pos (Maybe Mark)
 
 -- main functions
 winner :: [String] -> Maybe Mark
-winner xss
-    | hasWon Cross  board = Just Cross
-    | hasWon Nought board = Just Nought
-    | otherwise           = Nothing
-    where
-        board = boardFromString xss
-
-coord :: Mark -> (a,a) -> a
-coord Cross  = snd
-coord Nought = fst
+winner board
+    | hasWon Cross  (boardFromString board) = Just Cross
+    | hasWon Nought (boardFromString board) = Just Nought
+    | otherwise                             = Nothing
 
 hasWon :: Mark -> Board -> Bool
 hasWon mark board = not . null $ do
@@ -29,14 +22,12 @@ hasWon mark board = not . null $ do
     let (x,y) = last i
     let l     = crd (x,y)
 
-    let init = filter (\a -> board ! a == Just mark) . filter (\a -> 1 == crd a) $ i
-    let end  = filter (\a -> board ! a == Just mark) . filter (\a -> l == crd a) $ i
+    let ini = filter (\a -> board ! a == Just mark) . filter (\a -> 1 == crd a) $ i
+    let end = filter (\a -> board ! a == Just mark) . filter (\a -> l == crd a) $ i
 
-    a <- init
+    a <- ini
 
-    let paths = filter (\x -> last x `elem` end)
-              . extendPath board
-              $ [a]
+    let paths = filter (\e -> last e `elem` end) . extendPath board $ [a]
 
     paths
 
@@ -54,6 +45,10 @@ extendPath board path = if null ext then [path] else concat [ extendPath board p
         ext = possibleExtensions path nbh
              
 -- auxiliary functions
+coord :: Mark -> (a,a) -> a
+coord Cross  = snd
+coord Nought = fst
+
 possibleExtensions :: [a] -> [a] -> [[a]]
 possibleExtensions xs = map ( (++) xs . return )
 
