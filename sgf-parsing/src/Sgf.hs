@@ -1,16 +1,13 @@
 module Sgf (parseSgf) where
 
 import Control.Monad (liftM2)
---import Control.Monad.Combinators (some)
-import Data.Char (isAlphaNum, isAlpha, isUpper, isSpace)
+import Data.Char (isAlphaNum, isSpace)
 import Data.Map  (Map, fromList)
-import Data.Text (Text, pack, unpack)
+import Data.Text (Text, pack)
 import Data.Tree (Tree(..))
 import Data.Either.Combinators (rightToMaybe)
-import Text.Parsec (Parsec, parse, between, many, many1, oneOf, noneOf, satisfy, (<|>))
+import Text.Parsec (Parsec, parse, between, many, many1, oneOf, satisfy, (<|>))
 import Text.Parsec.Char (char, string, anyChar, upper)
-import Text.Parsec.Token (symbol)
--- import Text.Parsec.String (Parser)
 
 type SgfNode = Map Text [Text]
 type SgfTree = Tree SgfNode
