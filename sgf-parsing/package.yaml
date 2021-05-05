@@ -7,6 +7,7 @@ dependencies:
   - text
   - either
   - parsec
+  - parser-combinators
 
 library:
   exposed-modules: Sgf

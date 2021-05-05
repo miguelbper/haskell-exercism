@@ -30,7 +30,7 @@ version = Version [1,2,0,5] []
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 
 bindir     = "C:\\Users\\Miguel\\Exercism\\haskell\\sgf-parsing\\.stack-work\\install\\e0f1c74b\\bin"
-libdir     = "C:\\Users\\Miguel\\Exercism\\haskell\\sgf-parsing\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4\\sgf-parsing-1.2.0.5-D1me7T2osP3G7IQyrbCBPI"
+libdir     = "C:\\Users\\Miguel\\Exercism\\haskell\\sgf-parsing\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4\\sgf-parsing-1.2.0.5-EA7atnhZJuxHJIQSoArw8l"
 dynlibdir  = "C:\\Users\\Miguel\\Exercism\\haskell\\sgf-parsing\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4"
 datadir    = "C:\\Users\\Miguel\\Exercism\\haskell\\sgf-parsing\\.stack-work\\install\\e0f1c74b\\share\\x86_64-windows-ghc-8.8.4\\sgf-parsing-1.2.0.5"
 libexecdir = "C:\\Users\\Miguel\\Exercism\\haskell\\sgf-parsing\\.stack-work\\install\\e0f1c74b\\libexec\\x86_64-windows-ghc-8.8.4\\sgf-parsing-1.2.0.5"

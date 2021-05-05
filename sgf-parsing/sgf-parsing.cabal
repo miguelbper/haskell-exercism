@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e7219ac278158d780f593bfaea102339945d38efa15f8776d7c86dacd4608906
+-- hash: a3891b23cc2081a8e6e21639043ee900b9979167f01e8863fd4351668a6715e1
 
 name:           sgf-parsing
 version:        1.2.0.5
@@ -23,6 +23,7 @@ library
     , containers
     , either
     , parsec
+    , parser-combinators
     , text
   default-language: Haskell2010
 
@@ -39,6 +40,7 @@ test-suite test
     , either
     , hspec
     , parsec
+    , parser-combinators
     , sgf-parsing
     , text
   default-language: Haskell2010

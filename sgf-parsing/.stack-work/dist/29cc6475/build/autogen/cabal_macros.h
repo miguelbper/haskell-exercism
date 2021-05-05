@@ -55,6 +55,17 @@
   (major1) == 3 && (major2) == 1 && (minor) <= 14)
 #endif /* MIN_VERSION_parsec */
 
+/* package parser-combinators-1.2.1 */
+#ifndef VERSION_parser_combinators
+#define VERSION_parser_combinators "1.2.1"
+#endif /* VERSION_parser_combinators */
+#ifndef MIN_VERSION_parser_combinators
+#define MIN_VERSION_parser_combinators(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  2 || \
+  (major1) == 1 && (major2) == 2 && (minor) <= 1)
+#endif /* MIN_VERSION_parser_combinators */
+
 /* package text-1.2.4.0 */
 #ifndef VERSION_text
 #define VERSION_text "1.2.4.0"
@@ -155,10 +166,10 @@
 #endif /* MIN_TOOL_VERSION_strip */
 
 #ifndef CURRENT_PACKAGE_KEY
-#define CURRENT_PACKAGE_KEY "sgf-parsing-1.2.0.5-D1me7T2osP3G7IQyrbCBPI"
+#define CURRENT_PACKAGE_KEY "sgf-parsing-1.2.0.5-EA7atnhZJuxHJIQSoArw8l"
 #endif /* CURRENT_PACKAGE_KEY */
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "sgf-parsing-1.2.0.5-D1me7T2osP3G7IQyrbCBPI"
+#define CURRENT_COMPONENT_ID "sgf-parsing-1.2.0.5-EA7atnhZJuxHJIQSoArw8l"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "1.2.0.5"

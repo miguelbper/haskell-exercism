@@ -66,6 +66,17 @@
   (major1) == 3 && (major2) == 1 && (minor) <= 14)
 #endif /* MIN_VERSION_parsec */
 
+/* package parser-combinators-1.2.1 */
+#ifndef VERSION_parser_combinators
+#define VERSION_parser_combinators "1.2.1"
+#endif /* VERSION_parser_combinators */
+#ifndef MIN_VERSION_parser_combinators
+#define MIN_VERSION_parser_combinators(major1,major2,minor) (\
+  (major1) <  1 || \
+  (major1) == 1 && (major2) <  2 || \
+  (major1) == 1 && (major2) == 2 && (minor) <= 1)
+#endif /* MIN_VERSION_parser_combinators */
+
 /* package sgf-parsing-1.2.0.5 */
 #ifndef VERSION_sgf_parsing
 #define VERSION_sgf_parsing "1.2.0.5"
@@ -177,7 +188,7 @@
 #endif /* MIN_TOOL_VERSION_strip */
 
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "sgf-parsing-1.2.0.5-ITqnbIiCwBB3RoaKzNpcpa-test"
+#define CURRENT_COMPONENT_ID "sgf-parsing-1.2.0.5-GHHYwAE7Fuq879pGUWDJj1-test"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "1.2.0.5"
