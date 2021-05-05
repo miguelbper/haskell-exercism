@@ -7,8 +7,8 @@ import Data.Map  (Map, fromList)
 import Data.Text (Text, pack, unpack)
 import Data.Tree (Tree(..))
 import Data.Either.Combinators (rightToMaybe)
-import Text.Parsec (Parsec, parse, between, many, many1, oneOf, satisfy, (<|>))
-import Text.Parsec.Char (char, string, anyChar)
+import Text.Parsec (Parsec, parse, between, many, many1, oneOf, noneOf, satisfy, (<|>))
+import Text.Parsec.Char (char, string, anyChar, upper)
 import Text.Parsec.Token (symbol)
 -- import Text.Parsec.String (Parser)
 
@@ -25,23 +25,16 @@ braket = between (char '[') (char ']')
 semicolon :: Parser String
 semicolon = string ";"
 
-keyText :: Parser String
-keyText = many1 $ satisfy (liftM2 (&&) isAlpha isUpper)
-
-alphaNum :: Parser String
-alphaNum = many1 $ satisfy isAlphaNum
-
-escape :: Parser Char
-escape = (char '\\' >> anyChar) <|> (oneOf "\n\t" >> return ' ')
-
-valueString :: Parser String
-valueString = error "lol"
-
-key :: Parser Text
-key = pack <$> keyString
+valueChar :: Parser Char
+valueChar = (char '\\' >> anyChar) 
+        <|> (oneOf "\n\t" >> return ' ') 
+        <|> satisfy (liftM2 (||) isAlphaNum isSpace)
 
 value :: Parser Text
-value = pack <$> braket valueString
+value = pack . filter (`notElem` "\n\t") <$> braket (many1 valueChar)
+
+key :: Parser Text
+key = pack <$> many1 upper
 
 values :: Parser [Text]
 values = many1 value
