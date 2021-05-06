@@ -4,6 +4,7 @@ version: 0.1.0.3
 dependencies:
   - base
   - time
+  - lens
 
 library:
   exposed-modules: Person
