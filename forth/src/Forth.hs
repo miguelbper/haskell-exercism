@@ -8,15 +8,18 @@ module Forth
   ) where
 
 import Data.Char (isDigit, toUpper)
-import Data.Bool
-import Data.Text (Text, toLower, pack)
-import qualified Data.Text as T (head, words, map, all, null)
+import qualified Data.Char as C (toLower)
+import Data.Bool ( bool )
+import Data.Text (Text )
+import qualified Data.Text as T (words, map, all, null, toLower)
 import Data.Text.Read as TR (signed, decimal)
 import Data.Map (Map, fromList, insert)
 import qualified Data.Map as M (lookup, insert)
 import Control.Applicative (Alternative((<|>)))
-import Control.Monad (foldM, (>=>))
+import Control.Monad (foldM, (>=>), (<=<), join, liftM2)
 import Data.Attoparsec.Text (sepBy, anyChar, Parser, parseOnly, takeWhile1, manyTill, skipSpace, choice, string, decimal, char, (<?>))
+import Data.Maybe ( isJust, fromJust ) 
+import Data.Either (fromRight)
 
 data ForthError
      = DivisionByZero
@@ -28,27 +31,32 @@ data ForthError
 -- types
 type Stack      = [Int]
 type Operation  = Text
-type Action     = Stack -> Either ForthError Stack
+type Action     = Stack -> EStack
+type ActionMap  = Map Operation Action
 data ForthState = ForthState { stack   :: Stack, 
-                               actions :: Map Operation Action}
+                               actions :: ActionMap }
+
+type EStack      = Either ForthError Stack
+type EAction     = Either ForthError Action
+type EForthState = Either ForthError ForthState
 
 -- list
-toList :: ForthState -> [Int]
+toList :: ForthState -> Stack
 toList = reverse . stack
 
 -- empty
 emptyState :: ForthState
 emptyState = ForthState [] defaultActions
 
-defaultActions :: Map Operation Action
+defaultActions :: ActionMap
 defaultActions = fromList [ ("+"   , binaryOp (+))
                           , ("-"   , binaryOp (-))
                           , ("*"   , binaryOp (*))
                           , ("/"   , division    )
-                          , ("DUP" , oneElemList (\x   -> [x,x]  ))
-                          , ("DROP", oneElemList (\x   -> []     ))
-                          , ("SWAP", twoElemList (\x y -> [x,y]  ))
-                          , ("OVER", twoElemList (\x y -> [x,y,x])) ]
+                          , ("dup" , oneElemList (\x   -> [x,x]  ))
+                          , ("drop", oneElemList (\x   -> []     ))
+                          , ("swap", twoElemList (\x y -> [x,y]  ))
+                          , ("over", twoElemList (\x y -> [x,y,x])) ]
 
 binaryOp :: (Int -> Int -> Int) -> Action
 binaryOp op (x:y:xs) = Right (op y x : xs)
@@ -68,46 +76,57 @@ twoElemList op (x:y:xs) = Right (op y x ++ xs)
 twoElemList _  _        = Left StackUnderflow
 
 -- eval
-evalText :: Text -> ForthState -> Either ForthError ForthState
-evalText text state = eval state (T.words text)
+evalText :: Text -> ForthState -> EForthState
+evalText text = eval (T.words . T.toLower $ text) 
 
-eval :: ForthState -> [Text] -> Either ForthError ForthState
-eval st [] = Right st
-eval st (w:ws) = case T.map toUpper w of
-  ":" -> case break (";"==) ws of
-           (ws',_:ws'') -> either Left (flip eval ws'') (updateDictWith ws' st)
-           _            -> Left InvalidWord
-  wd | T.all isDigit wd -> eval (st { stack = decimalToIntegral wd : stack st }) ws
-     | otherwise        -> case M.lookup wd (actions st) of
-                             Nothing -> Left $ UnknownWord w
-                             Just f  -> either Left (flip eval ws) (updateStack f st)
+eval :: [Text] -> ForthState -> EForthState
+eval []     state = Right state
+eval (w:ws) state
+    | deft      = case break (";"==) ws of
+        (xs, [_]) -> updateWithDeft xs state
+        _         -> Left InvalidWord
+    | numb      = eval ws (updateWithNumb (intFromText w) state)
+    | word      = eval ws =<< updateWithWord act' state
+    | otherwise = Left $ UnknownWord w
+    where
+        deft = w == ":"
+        numb = T.all isDigit w
+        word = isJust act
 
-updateStack :: ([Int] -> Either ForthError [Int]) -> ForthState -> Either ForthError ForthState
-updateStack s st = either Left (Right . f) (s $ stack st)
-  where
-    f stk = st { stack = stk }
+        act  = M.lookup w (actions state)
+        act' = fromJust act
 
-updateDictWith :: [Text] -> ForthState -> Either ForthError ForthState
-updateDictWith wws st = case map (T.map toUpper) wws of
+updateWithNumb :: Int -> ForthState -> ForthState
+updateWithNumb x (ForthState state actions) = ForthState (x:state) actions
+
+updateWithWord :: (Stack -> EStack) -> ForthState -> EForthState
+updateWithWord action state = fmap f estack
+    where
+        estack = action (stack state)
+        f stk  = state { stack = stk }
+
+updateWithDeft :: [Text] -> ForthState -> EForthState
+updateWithDeft wss state = case wss of
     w:ws | T.all isDigit w -> Left InvalidWord
-         | otherwise       -> case mkop (actions st) ws of
+         | otherwise       -> case mkop (actions state) ws of
              Left e  -> Left e
-             Right f -> Right $ st { actions = M.insert (T.map toUpper w) f (actions st) }
+             Right f -> Right $ state { actions = M.insert w f (actions state) }
 
-mkop :: Map Text Action -> [Text] -> Either ForthError Action
+mkop :: ActionMap -> [Text] -> EAction
 mkop dic = foldr f (Right pure)
   where
     f x eop = if T.all isDigit x
-              then composeOP (pure . (decimalToIntegral x :)) eop
+              then composeOp (pure . (intFromText x :)) eop
               else case M.lookup x dic of
                      Nothing -> Left (UnknownWord x)
-                     Just op -> composeOP op eop
+                     Just op -> composeOp op eop
 
-decimalToIntegral :: Integral a => Text -> a
-decimalToIntegral t = either (error . id)
-                             (\ (i,rt) -> bool (error "invalid input") i (T.null rt))
-                             (TR.signed TR.decimal t)
+-- auxiliary
+intFromText :: Text -> Int
+intFromText = fst . fromRight (0,"") . TR.decimal
 
-composeOP :: Action -> Either ForthError Action -> Either ForthError Action
-composeOP op (Right op') = Right (op >=> op')
-composeOp _  eop         = eop
+composeAction :: Action -> Action -> Action
+composeAction f g = g <=< f
+
+composeOp :: Action -> EAction -> EAction
+composeOp = fmap . composeAction
