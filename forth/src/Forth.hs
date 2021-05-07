@@ -26,14 +26,9 @@ data ForthError
 -- types
 type Stack      = [Int]
 type Operation  = Text
-type Action     = ForthState -> Either ForthError ForthState
+type Action     = Stack -> Either ForthError Stack
 data ForthState = ForthState { stack   :: Stack, 
                                actions :: Map Operation Action}
-
-data Dictionary = Definition Text [Dictionary]
-                | Number     Int
-                | Word       Text
-                deriving (Eq, Show)
 
 -- list
 toList :: ForthState -> [Int]
@@ -54,42 +49,22 @@ defaultActions = fromList [ ("+"   , binaryOp (+))
                           , ("over", twoElemList (\x y -> [x,y,x])) ]
 
 binaryOp :: (Int -> Int -> Int) -> Action
-binaryOp op (ForthState (x:y:xs) act) = Right (ForthState (op y x : xs) act)
-binaryOp _  _                         = Left StackUnderflow
+binaryOp op (x:y:xs) = Right (op y x : xs)
+binaryOp _  _        = Left StackUnderflow
 
 division :: Action
-division (ForthState (0:y:xs) act) = Left DivisionByZero
-division (ForthState (x:y:xs) act) = Right (ForthState (div y x : xs) act)
-division _                         = Left StackUnderflow
+division (0:y:xs) = Left DivisionByZero
+division (x:y:xs) = Right (div y x : xs)
+division _        = Left StackUnderflow
 
 oneElemList :: (Int -> Stack) -> Action
-oneElemList op (ForthState (x:xs) act) = Right (ForthState (op x ++ xs) act)
-oneElemList _  _                       = Left StackUnderflow
+oneElemList op (x:xs) = Right (op x ++ xs)
+oneElemList _  _      = Left StackUnderflow
 
 twoElemList :: (Int -> Int -> Stack) -> Action
-twoElemList op (ForthState (x:y:xs) act) = Right (ForthState (op y x ++ xs) act)
-twoElemList _  _                         = Left StackUnderflow
+twoElemList op (x:y:xs) = Right (op y x ++ xs)
+twoElemList _  _        = Left StackUnderflow
 
 -- eval
 evalText :: Text -> ForthState -> Either ForthError ForthState
-evalText text state = case parseOnly parser text of
-    Left  msg -> error msg
-    Right dic -> foldM process state dic
-
-process :: ForthState -> Dictionary -> Either ForthError ForthState
-process s@(ForthState ls ops) (Number v) = return $ ForthState (v:ls) ops 
-process s@(ForthState ls ops) (Word w) = case toLower w `M.lookup` ops of
-    Just op -> op s
-    Nothing -> Left (UnknownWord w)
-process s@(ForthState ls ops) (Definition t act)
-    | C.isDigit (T.head t) = Left InvalidWord -- XXX move to parser
-    | otherwise = return $ ForthState ls (insert (toLower t) (flip (foldM process) act) ops)
-
-parser :: Parser [Dictionary]
-parser = (definition <|> computation) `sepBy` anyChar
-
-computation :: Parser Dictionary
-computation = choice [Number <$> decimal, Word <$> takeWhile1 (/=' ')]
-
-definition :: Parser Dictionary
-definition = Definition <$> (string ": " *> takeWhile1 (/=' ')) <*> manyTill (skipSpace *> computation) (skipSpace *> char ';') <?> "definition"
+evalText text state = error "l"
