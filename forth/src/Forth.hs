@@ -100,33 +100,33 @@ updateWithNumb :: Int -> ForthState -> ForthState
 updateWithNumb x (ForthState state actions) = ForthState (x:state) actions
 
 updateWithWord :: (Stack -> EStack) -> ForthState -> EForthState
-updateWithWord action state = fmap f estack
+updateWithWord action state@(ForthState stack acts) = fmap f estack
     where
-        estack = action (stack state)
-        f stk  = state { stack = stk }
+        estack = action stack
+        f stk  = ForthState stk acts
 
 updateWithDeft :: [Text] -> ForthState -> EForthState
-updateWithDeft wss state = case wss of
-    w:ws | T.all isDigit w -> Left InvalidWord
-         | otherwise       -> case mkop (actions state) ws of
-             Left e  -> Left e
-             Right f -> Right $ state { actions = M.insert w f (actions state) }
+updateWithDeft wws state@(ForthState stack acts)
+    | numb      = Left InvalidWord
+    | otherwise = case mkop acts ws of
+        Left  err -> Left err
+        Right act -> Right (ForthState stack (M.insert w act acts))
+    where
+        w    = head wws
+        ws   = drop 1 wws
+        numb = T.all isDigit w
 
 mkop :: ActionMap -> [Text] -> EAction
-mkop dic = foldr f (Right pure)
-  where
-    f x eop = if T.all isDigit x
-              then composeOp (pure . (intFromText x :)) eop
-              else case M.lookup x dic of
-                     Nothing -> Left (UnknownWord x)
-                     Just op -> composeOp op eop
+mkop dic = foldr (mkopF dic) (Right pure)
 
--- auxiliary
+mkopF :: ActionMap -> Text -> EAction -> EAction
+mkopF dic x eop
+    | numb       = (fmap . (>=>)) (pure . (intFromText x :)) eop
+    | otherwise  = case M.lookup x dic of
+        Nothing -> Left (UnknownWord x)
+        Just op -> (fmap . (>=>)) op eop
+    where
+        numb = T.all isDigit x
+
 intFromText :: Text -> Int
 intFromText = fst . fromRight (0,"") . TR.decimal
-
-composeAction :: Action -> Action -> Action
-composeAction f g = g <=< f
-
-composeOp :: Action -> EAction -> EAction
-composeOp = fmap . composeAction
