@@ -29,12 +29,12 @@ version :: Version
 version = Version [1,3,0,7] []
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 
-bindir     = "C:\\Users\\Miguel\\Exercism\\haskell\\POV\\.stack-work\\install\\e0f1c74b\\bin"
-libdir     = "C:\\Users\\Miguel\\Exercism\\haskell\\POV\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4\\pov-1.3.0.7-6xwlHHqb4kL4yL6VAsUfG"
-dynlibdir  = "C:\\Users\\Miguel\\Exercism\\haskell\\POV\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4"
-datadir    = "C:\\Users\\Miguel\\Exercism\\haskell\\POV\\.stack-work\\install\\e0f1c74b\\share\\x86_64-windows-ghc-8.8.4\\pov-1.3.0.7"
-libexecdir = "C:\\Users\\Miguel\\Exercism\\haskell\\POV\\.stack-work\\install\\e0f1c74b\\libexec\\x86_64-windows-ghc-8.8.4\\pov-1.3.0.7"
-sysconfdir = "C:\\Users\\Miguel\\Exercism\\haskell\\POV\\.stack-work\\install\\e0f1c74b\\etc"
+bindir     = "C:\\Users\\Miguel\\Exercism\\haskell\\pov\\.stack-work\\install\\e0f1c74b\\bin"
+libdir     = "C:\\Users\\Miguel\\Exercism\\haskell\\pov\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4\\pov-1.3.0.7-6xwlHHqb4kL4yL6VAsUfG"
+dynlibdir  = "C:\\Users\\Miguel\\Exercism\\haskell\\pov\\.stack-work\\install\\e0f1c74b\\lib\\x86_64-windows-ghc-8.8.4"
+datadir    = "C:\\Users\\Miguel\\Exercism\\haskell\\pov\\.stack-work\\install\\e0f1c74b\\share\\x86_64-windows-ghc-8.8.4\\pov-1.3.0.7"
+libexecdir = "C:\\Users\\Miguel\\Exercism\\haskell\\pov\\.stack-work\\install\\e0f1c74b\\libexec\\x86_64-windows-ghc-8.8.4\\pov-1.3.0.7"
+sysconfdir = "C:\\Users\\Miguel\\Exercism\\haskell\\pov\\.stack-work\\install\\e0f1c74b\\etc"
 
 getBinDir, getLibDir, getDynLibDir, getDataDir, getLibexecDir, getSysconfDir :: IO FilePath
 getBinDir = catchIO (getEnv "pov_bindir") (\_ -> return bindir)

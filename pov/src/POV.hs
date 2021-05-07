@@ -1,24 +1,29 @@
 module POV (fromPOV, tracePathBetween) where
 
 import Data.Tree (Tree(Node, rootLabel), Forest)
-import Data.Maybe ( fromJust, listToMaybe )
-import Control.Monad ( join )
-import Data.List ( inits, tails )
+import Data.Maybe ( fromJust, listToMaybe, catMaybes )
+import Data.List (delete)
 
 fromPOV :: Eq a => a -> Tree a -> Maybe (Tree a)
-fromPOV x tree = inverse =<< findPath x tree
+fromPOV x tree = invert =<< paths [] x tree
 
 tracePathBetween :: Eq a => a -> a -> Tree a -> Maybe [a]
 tracePathBetween from to tree = p2l path
     where
         tree' = fromPOV to tree
-        path  = findPath from =<< tree'
+        path  = paths [] from =<< tree'
         p2l   = fmap (map rootLabel)
 
-inverse :: Forest a -> Maybe (Tree a)
-inverse            []  = Nothing
-inverse (Node a ls:[]) = Just (Node a ls)
-inverse (Node a ls:ts) = Just (Node a ((fromJust . inverse $ ts) : ls))
+invert :: Forest a -> Maybe (Tree a)
+invert            []  = Nothing
+invert (Node a ls:[]) = Just (Node a ls)
+invert (Node a ls:ts) = Just (Node a ((fromJust . invert $ ts) : ls))
 
-findPath :: Eq a => a -> Tree a -> Maybe (Forest a)
-findPath goal tree = error "lol"
+paths :: Eq a => Forest a -> a -> Tree a -> Maybe (Forest a)
+paths f a (Node b ts) 
+    | a == b    = Just (Node b ts : f)
+    | otherwise = listToMaybe . catMaybes $ do
+        t <- ts
+        let ts' = delete t ts
+        let f'  = Node b ts' : f
+        return $ paths f' a t
