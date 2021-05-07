@@ -7,19 +7,14 @@ module Forth
   , emptyState
   ) where
 
-import Data.Char (isDigit, toUpper)
-import qualified Data.Char as C (toLower)
-import Data.Bool ( bool )
-import Data.Text (Text )
-import qualified Data.Text as T (words, map, all, null, toLower)
-import Data.Text.Read as TR (signed, decimal)
-import Data.Map (Map, fromList, insert)
-import qualified Data.Map as M (lookup, insert)
-import Control.Applicative (Alternative((<|>)))
-import Control.Monad (foldM, (>=>), (<=<), join, liftM2)
-import Data.Attoparsec.Text (sepBy, anyChar, Parser, parseOnly, takeWhile1, manyTill, skipSpace, choice, string, decimal, char, (<?>))
-import Data.Maybe ( isJust, fromJust ) 
-import Data.Either (fromRight)
+import Prelude hiding (lookup, words, all)
+import Data.Char      (isDigit)
+import Data.Text      (Text, words, all, toLower)
+import Data.Text.Read (decimal)
+import Data.Map       (Map, fromList, lookup, insert)
+import Data.Maybe     (isJust, fromJust) 
+import Data.Either    (fromRight)
+import Control.Monad  ((>=>))
 
 data ForthError
      = DivisionByZero
@@ -54,7 +49,7 @@ defaultActions = fromList [ ("+"   , binaryOp (+))
                           , ("*"   , binaryOp (*))
                           , ("/"   , division    )
                           , ("dup" , oneElemList (\x   -> [x,x]  ))
-                          , ("drop", oneElemList (\x   -> []     ))
+                          , ("drop", oneElemList (\_   -> []     ))
                           , ("swap", twoElemList (\x y -> [x,y]  ))
                           , ("over", twoElemList (\x y -> [x,y,x])) ]
 
@@ -63,7 +58,7 @@ binaryOp op (x:y:xs) = Right (op y x : xs)
 binaryOp _  _        = Left StackUnderflow
 
 division :: Action
-division (0:y:xs) = Left DivisionByZero
+division (0:_:_ ) = Left DivisionByZero
 division (x:y:xs) = Right (div y x : xs)
 division _        = Left StackUnderflow
 
@@ -77,7 +72,7 @@ twoElemList _  _        = Left StackUnderflow
 
 -- eval
 evalText :: Text -> ForthState -> EForthState
-evalText text = eval (T.words . T.toLower $ text) 
+evalText text = eval (words . toLower $ text) 
 
 eval :: [Text] -> ForthState -> EForthState
 eval []     state = Right state
@@ -90,31 +85,31 @@ eval (w:ws) state
     | otherwise = Left $ UnknownWord w
     where
         deft = w == ":"
-        numb = T.all isDigit w
+        numb = all isDigit w
         word = isJust act
 
-        act  = M.lookup w (actions state)
+        act  = lookup w (actions state)
         act' = fromJust act
 
 updateWithNumb :: Int -> ForthState -> ForthState
-updateWithNumb x (ForthState state actions) = ForthState (x:state) actions
+updateWithNumb x (ForthState state acts) = ForthState (x:state) acts
 
 updateWithWord :: (Stack -> EStack) -> ForthState -> EForthState
-updateWithWord action state@(ForthState stack acts) = fmap f estack
+updateWithWord action (ForthState stk acts) = fmap f estack
     where
-        estack = action stack
-        f stk  = ForthState stk acts
+        estack = action stk
+        f sstk = ForthState sstk acts
 
 updateWithDeft :: [Text] -> ForthState -> EForthState
-updateWithDeft wws state@(ForthState stack acts)
+updateWithDeft wws (ForthState stk acts)
     | numb      = Left InvalidWord
     | otherwise = case mkop acts ws of
         Left  err -> Left err
-        Right act -> Right (ForthState stack (M.insert w act acts))
+        Right act -> Right (ForthState stk (insert w act acts))
     where
         w    = head wws
         ws   = drop 1 wws
-        numb = T.all isDigit w
+        numb = all isDigit w
 
 mkop :: ActionMap -> [Text] -> EAction
 mkop dic = foldr (mkopF dic) (Right pure)
@@ -122,11 +117,11 @@ mkop dic = foldr (mkopF dic) (Right pure)
 mkopF :: ActionMap -> Text -> EAction -> EAction
 mkopF dic x eop
     | numb       = (fmap . (>=>)) (pure . (intFromText x :)) eop
-    | otherwise  = case M.lookup x dic of
+    | otherwise  = case lookup x dic of
         Nothing -> Left (UnknownWord x)
         Just op -> (fmap . (>=>)) op eop
     where
-        numb = T.all isDigit x
+        numb = all isDigit x
 
 intFromText :: Text -> Int
-intFromText = fst . fromRight (0,"") . TR.decimal
+intFromText = fst . fromRight (0,"") . decimal
