@@ -1,0 +1,36 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: e73727b4d7015ff9b56b71d10c86f1d2e88985085795ab0fd33fc3ff8bfb9daf
+
+name:           lucians-luscious-lasagna
+version:        1.0.0.0
+build-type:     Simple
+
+library
+  exposed-modules:
+      LuciansLusciousLasagna
+  other-modules:
+      Paths_lucians_luscious_lasagna
+  hs-source-dirs:
+      src
+  ghc-options: -Wall
+  build-depends:
+      base
+  default-language: Haskell2010
+
+test-suite test
+  type: exitcode-stdio-1.0
+  main-is: Tests.hs
+  other-modules:
+      Paths_lucians_luscious_lasagna
+  hs-source-dirs:
+      test
+  build-depends:
+      base
+    , hspec
+    , lucians-luscious-lasagna
+  default-language: Haskell2010
